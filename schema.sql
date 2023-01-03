@@ -1,0 +1,14 @@
+CREATE TABLE users (
+  id serial PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  balance INTEGER NOT NULL
+);
+
+CREATE TABLE donations (
+  id serial PRIMARY KEY,
+  sender INTEGER REFERENCES users(id) NOT NULL,
+  recipient INTEGER REFERENCES users(id) NOT NULL,
+  amount INTEGER NOT NULL,
+  message TEXT,
+  date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);

@@ -1,0 +1,74 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  DonationAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+      DefinitionBody:
+        swagger: '2.0'
+        info:
+          version: '1.0.0'
+          title: Donation API
+        paths:
+          /user:
+            get:
+              parameters:
+                - name: userId
+                  in: query
+                  required: true
+                  type: string
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetUserLambda.Arn}/invocations
+                httpMethod: POST
+                passthroughBehavior: when_no_match
+                requestTemplates:
+                  application/json: "{\"httpMethod\": \"$context.httpMethod\", \"resourcePath\": \"$context.resourcePath\", \"queryStringParameters\": $input.params()}"
+          /team:
+            get:
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetTeamLambda.Arn}/invocations
+                httpMethod: POST
+                passthroughBehavior: when_no_match
+                requestTemplates:
+                  application/json: "{\"httpMethod\": \"$context.httpMethod\", \"resourcePath\": \"$context.resourcePath\", \"queryStringParameters\": $input.params()}"
+          /donations:
+            get:
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetDonationsLambda.Arn}/invocations
+                httpMethod: POST
+                passthroughBehavior: when_no_match
+                requestTemplates:
+                  application/json: "{\"httpMethod\": \"$context.httpMethod\", \"resourcePath\": \"$context.resourcePath\", \"queryStringParameters\": $input.params()}"
+          /donation:
+              post:
+                parameters:
+                  - name: body
+                    in: body
+                    required: true
+                    schema:
+                      type: object
+                      required:
+                        - sender
+                        - recipient
+                        - amount
+                      properties:
+                        sender:
+                          type: string
+                        recipient:
+                          type: string
+                        amount:
+                          type: integer
+                        message:
+                          type: string
+                x-amazon-apigateway-integration:
+                  type: aws_proxy
+                  uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MakeDonationLambda.Arn}/invocations
+                  httpMethod: POST
+                  passthroughBehavior: when_no_match
+                  requestTemplates:
+                    application/json: "{\"httpMethod\": \"$context.httpMethod\", \"resourcePath\": \"$context.resourcePath\", \"queryStringParameters\": $input.params(), \"body\": $input.json('$')}"
+                    

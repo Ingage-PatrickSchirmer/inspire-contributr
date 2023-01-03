@@ -1,0 +1,82 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  GetUserLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/get-user
+      FunctionName: get-user
+      Role: !GetAtt IAMRole.Arn
+      Handler: index.getUser
+      Runtime: nodejs14.x
+      Events:
+        GetUserAPI:
+          Type: Api
+          Properties:
+            Path: /user
+            Method: get
+  GetTeamLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/get-team
+      FunctionName: get-team
+      Role: !GetAtt IAMRole.Arn
+      Handler: index.getTeam
+      Runtime: nodejs14.x
+      Events:
+        GetTeamAPI:
+          Type: Api
+          Properties:
+            Path: /team
+            Method: get
+  GetDonationsLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/get-donations
+      FunctionName: get-donations
+      Role: !GetAtt IAMRole.Arn
+      Handler: index.getDonations
+      Runtime: nodejs14.x
+      Events:
+        GetDonationsAPI:
+          Type: Api
+          Properties:
+            Path: /donations
+            Method: get
+  MakeDonationLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/make-donation
+      FunctionName: make-donation
+      Role: !GetAtt IAMRole.Arn
+      Handler: index.makeDonation
+      Runtime: nodejs14.x
+      Events:
+        MakeDonationAPI:
+          Type: Api
+          Properties:
+            Path: /donation
+            Method: post
+   IAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:*
+                  - s3:*
+                  - rds:*
+                Resource: '*'
